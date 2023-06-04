@@ -10,7 +10,9 @@ Rules That Every Red-Black Tree Follows:
 #include <stdio.h>
 #include <stdlib.h>
 
-// Color handling.
+// Color handling
+// black = 0
+// red = 1
 enum node_color{
     black,
     red
@@ -30,41 +32,41 @@ Node* root = NULL;
 
 Node* new_node(int data)
 {
-    Node* new_node = malloc(sizeof(Node));
-    if (new_node == NULL)
+    Node* node = malloc(sizeof(Node));
+    if (node == NULL)
         exit(1);
     
-    new_node -> data = data;
-    new_node -> parent = NULL;
-    new_node -> left_child = NULL;
-    new_node -> right_child = NULL;
-    new_node -> color = red;
-    return new_node;
+    node -> data = data;
+    node -> parent = NULL;
+    node -> left_child = NULL;
+    node -> right_child = NULL;
+    node -> color = red;
+    return node;
 }
 
 // Insert function for rbt.
-Node* insert(Node* start_node, Node* new_node)
+Node* insert(Node* traverse_node, Node* node)
 {
     // If tree is empty,
     // new_node is new root of the tree.
-    if (start_node == NULL)
-        return new_node;
+    if (traverse_node == NULL)
+        return node;
 
     // New data is smaller, move to the left child.
-    if (new_node -> data < start_node -> data)
+    if (node -> data < traverse_node -> data)
     {
-        start_node -> left_child = insert(start_node -> left_child, new_node);
-        start_node -> left_child -> parent = start_node;
+        traverse_node -> left_child = insert(traverse_node -> left_child, node);
+        traverse_node -> left_child -> parent = traverse_node;
     }
 
     // New data is larger, move to the right child.
-    else if (new_node -> data > start_node -> data)
+    else if (node -> data > traverse_node -> data)
     {
-        start_node -> right_child = insert(start_node -> right_child, new_node);
-        start_node -> right_child -> parent = start_node;
+        traverse_node -> right_child = insert(traverse_node -> right_child, node);
+        traverse_node -> right_child -> parent = traverse_node;
     }
 
-    return start_node;
+    return traverse_node;
 }
 
 // Function for right rotation.
@@ -103,24 +105,25 @@ void left_rotation(Node* node)
     node -> parent = right;
 }
 
+// Function to fix violations that arouse because of the insertion.
 void fix_tree_after_insertion(Node* root, Node* node)
 {
     Node* parent_of_node = NULL;
     Node* grand_parent_of_node = NULL;
     Node* uncle_of_node = NULL;
-    enum node_color temp;
+    enum node_color temp = red;
 
     while ((node != root) && (node -> color != black)
-    && (node -> parent -> color == red))
+           && (node -> parent -> color == red))
     {
         parent_of_node = node -> parent;
         grand_parent_of_node = node -> parent -> parent;
+        
         /*
         Case A:
             Parent of a node is a left child 
             of grand-parent of the node.
         */
-
        if (parent_of_node == grand_parent_of_node -> left_child)
        {
             uncle_of_node = grand_parent_of_node -> right_child;
@@ -209,7 +212,7 @@ void fix_tree_after_insertion(Node* root, Node* node)
                 left_rotation(grand_parent_of_node);
                 temp = parent_of_node -> color;
                 parent_of_node -> color = grand_parent_of_node -> color;
-                grand_parent_of_node -> color = node;
+                grand_parent_of_node -> color = temp;
                 node = parent_of_node;
             }
         }
@@ -228,28 +231,28 @@ Node* search(Node* root, int data)
         return search(root -> right_child, data);
 }
 
-void deallocate(Node* root)
-{
-    if (root != NULL)
-    {
-        deallocate(root -> left_child);
-        free(root);
-        deallocate(root -> right_child);
-    }
-}
-
 void show_tree(Node* root)
 {
     if (root != NULL)
     {
         show_tree(root -> left_child);
-        printf("%d -> ", root -> data);
+        printf("%d ", root -> data);
         show_tree(root -> right_child);
     }
 }
 
 int main(int argc, char* argv[])
 {
-    
+    Node* node = NULL;
+    int nums[10] = {1, 2, 10, 11, 7, 3, 4, 5, 9, 12};
+    for (int i = 0; i < 10; i++)
+    {
+        node = new_node(nums[i]);
+        root = insert(root, node);
+        fix_tree_after_insertion(root, node);
+        root -> color = black;
+    }
+
+    show_tree(root);
     return 0;
 }
