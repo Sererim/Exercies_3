@@ -220,16 +220,16 @@ void fix_tree_after_insertion(Node* root, Node* node)
 }
 
 // Search function.
-Node* search(Node* root, int data)
-{
-    // Root is NULL or key is present at root.
-    if (root == NULL || root -> data == data)
-        return root;
-    if (root -> data > data)
-        return search(root -> left_child, data);
-    if (root -> data < data)
-        return search(root -> right_child, data);
-}
+// Node* search(Node* root, int data)
+// {
+//     // Root is NULL or key is present at root.
+//     if (root == NULL || root -> data == data)
+//         return root;
+//     if (root -> data > data)
+//         return search(root -> left_child, data);
+//     if (root -> data < data)
+//         return search(root -> right_child, data);
+// }
 
 void show_tree(Node* root)
 {
@@ -252,7 +252,7 @@ int main(int argc, char* argv[])
         fix_tree_after_insertion(root, node);
         root -> color = black;
     }
-
+    // printf("%d", search(root, 9) -> data);
     show_tree(root);
     return 0;
 }
